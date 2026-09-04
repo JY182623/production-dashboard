@@ -31,6 +31,11 @@
 @keyframes targetPulse { 0%,100% { opacity:0.3; transform: translateX(-50%) rotateX(75deg) scale(1); } 50% { opacity:0.8; transform: translateX(-50%) rotateX(75deg) scale(1.1); } }
 @keyframes nodePulse { 0%,100% { box-shadow:0 0 20px currentColor,inset 0 0 15px rgba(255,255,255,0.1); transform:scale(1); } 50% { box-shadow:0 0 35px currentColor,inset 0 0 20px rgba(255,255,255,0.15); transform:scale(1.08); } }
 @keyframes moveDot { 0% { left:0%; } 100% { left:100%; } }
+@keyframes hexSpin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+@keyframes hexSpinR { 0% { transform:rotate(0deg); } 100% { transform:rotate(-360deg); } }
+@keyframes trajParticle { 0% { offset-distance:0%; opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { offset-distance:100%; opacity:0; } }
+@keyframes scanRing { 0% { transform:scale(0.5); opacity:0.8; } 100% { transform:scale(1.8); opacity:0; } }
+@keyframes glowPulse { 0%,100% { filter:drop-shadow(0 0 3px currentColor); } 50% { filter:drop-shadow(0 0 10px currentColor); } }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Microsoft YaHei', -apple-system, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 30%, #1a1a3e 50%, #1e293b 70%, #0f172a 100%); background-size: 400% 400%; animation: bgFlow 15s ease infinite; color: #e2e8f0; min-height: 100vh; padding: 24px; overflow-x: hidden; }
 .header { text-align: center; padding: 30px 0 20px; animation: fadeUp 0.8s ease-out; }
@@ -235,51 +240,78 @@ body { font-family: 'Microsoft YaHei', -apple-system, sans-serif; background: li
     </div>
   </div>
   <div class="chart-card"><div class="chart-title">预测下线日期追踪</div>
-    <div class="chart-box" id="chart5" style="position:relative;overflow:hidden;border-radius:8px;background:radial-gradient(circle at 50% 50%,rgba(20,10,40,0.5),rgba(5,5,15,0.8));display:flex;align-items:center;justify-content:center;padding:20px 16px;box-sizing:border-box;">
-      <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,255,0.01) 2px,rgba(0,255,255,0.01) 3px);pointer-events:none;"></div>
-      <div style="position:absolute;top:8px;left:12px;color:rgba(0,255,255,0.3);font-size:8px;font-family:monospace;letter-spacing:1px;">[ TIMELINE ]</div>
-      <div style="position:absolute;top:8px;right:12px;color:rgba(0,255,136,0.4);font-size:8px;font-family:monospace;animation:blink 2s infinite;">● TRACKING</div>
-      <div style="position:relative;width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="text-align:center;position:relative;z-index:2;">
-          <div style="width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.8),rgba(59,130,246,0.2));border:2px solid #3b82f6;box-shadow:0 0 20px rgba(59,130,246,0.6),inset 0 0 15px rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:nodePulse 2s ease infinite;">
-            <div style="width:12px;height:12px;border-radius:50%;background:#60a5fa;box-shadow:0 0 10px #60a5fa;"></div>
+    <div class="chart-box" id="chart5" style="position:relative;overflow:hidden;border-radius:8px;background:linear-gradient(180deg,rgba(5,10,30,0.95),rgba(10,5,25,0.95));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,255,255,0.015) 40px,rgba(0,255,255,0.015) 41px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,255,255,0.015) 40px,rgba(0,255,255,0.015) 41px);pointer-events:none;"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(59,130,246,0.06),transparent 60%);pointer-events:none;"></div>
+      <div style="position:absolute;top:8px;left:12px;color:rgba(0,255,255,0.4);font-size:9px;font-family:monospace;letter-spacing:1px;z-index:2;">[ MISSION CONTROL ]</div>
+      <div style="position:absolute;top:8px;right:12px;color:rgba(0,255,136,0.5);font-size:9px;font-family:monospace;animation:blink 2s infinite;z-index:2;">● LIVE</div>
+
+      <div style="position:relative;width:100%;max-width:560px;height:200px;margin-top:10px;">
+        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;" viewBox="0 0 560 200" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="trajG" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#3b82f6"/>
+              <stop offset="33%" style="stop-color:#10b981"/>
+              <stop offset="66%" style="stop-color:#f59e0b"/>
+              <stop offset="100%" style="stop-color:#ef4444"/>
+            </linearGradient>
+            <filter id="trajGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M 40 160 Q 180 50 280 90 T 520 30" stroke="url(#trajG)" stroke-width="2" fill="none" filter="url(#trajGlow)" opacity="0.5"/>
+          <path d="M 40 160 Q 180 50 280 90 T 520 30" stroke="url(#trajG)" stroke-width="1" fill="none" stroke-dasharray="3 5" opacity="0.3"/>
+          <circle cx="40" cy="160" r="3" fill="#3b82f6" opacity="0.5"><animate attributeName="r" values="3;8;3" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="280" cy="90" r="3" fill="#10b981" opacity="0.5"><animate attributeName="r" values="3;8;3" dur="2s" begin="0.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0;0.5" dur="2s" begin="0.5s" repeatCount="indefinite"/></circle>
+          <circle cx="520" cy="30" r="3" fill="#f59e0b" opacity="0.5"><animate attributeName="r" values="3;8;3" dur="2s" begin="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0;0.5" dur="2s" begin="1s" repeatCount="indefinite"/></circle>
+        </svg>
+
+        <div style="position:absolute;left:10px;bottom:10px;text-align:center;z-index:2;">
+          <div style="width:52px;height:52px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <div style="position:absolute;inset:0;border:2px solid rgba(59,130,246,0.5);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpin 8s linear infinite;"></div>
+            <div style="position:absolute;inset:4px;border:1px solid rgba(59,130,246,0.3);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpinR 6s linear infinite;"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#60a5fa;box-shadow:0 0 15px #60a5fa,0 0 30px rgba(59,130,246,0.4);"></div>
           </div>
-          <div style="margin-top:8px;color:#60a5fa;font-size:11px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(59,130,246,0.5);">今日</div>
-          <div style="color:rgba(96,165,250,0.6);font-size:9px;font-family:monospace;margin-top:2px;">09/03</div>
+          <div style="margin-top:6px;color:#60a5fa;font-size:13px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(59,130,246,0.6);">今日</div>
+          <div style="color:rgba(96,165,250,0.7);font-size:11px;font-family:monospace;margin-top:2px;">09/03</div>
         </div>
-        <div style="flex:1;height:2px;margin:0 -5px;position:relative;background:linear-gradient(90deg,rgba(59,130,246,0.6),rgba(16,185,129,0.6));box-shadow:0 0 10px rgba(16,185,129,0.3);">
-          <div style="position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px #3b82f6;"></div>
-          <div style="position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:moveDot 3s linear infinite;left:30%;"></div>
-        </div>
-        <div style="text-align:center;position:relative;z-index:2;">
-          <div style="width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,0.8),rgba(16,185,129,0.2));border:2px solid #10b981;box-shadow:0 0 20px rgba(16,185,129,0.6),inset 0 0 15px rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:nodePulse 2s ease infinite 0.5s;">
-            <div style="width:12px;height:12px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;"></div>
+
+        <div style="position:absolute;left:43%;top:15px;text-align:center;z-index:2;">
+          <div style="width:52px;height:52px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <div style="position:absolute;inset:0;border:2px solid rgba(16,185,129,0.5);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpin 8s linear infinite 1s;"></div>
+            <div style="position:absolute;inset:4px;border:1px solid rgba(16,185,129,0.3);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpinR 6s linear infinite 0.5s;"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#34d399;box-shadow:0 0 15px #34d399,0 0 30px rgba(16,185,129,0.4);"></div>
           </div>
-          <div style="margin-top:8px;color:#34d399;font-size:11px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(16,185,129,0.5);">开包下线</div>
-          <div style="color:rgba(52,211,153,0.6);font-size:9px;font-family:monospace;margin-top:2px;">9月8号</div>
+          <div style="margin-top:6px;color:#34d399;font-size:13px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(16,185,129,0.6);">开包下线</div>
+          <div style="color:rgba(52,211,153,0.7);font-size:11px;font-family:monospace;margin-top:2px;">9月8号</div>
         </div>
-        <div style="flex:1;height:2px;margin:0 -5px;position:relative;background:linear-gradient(90deg,rgba(16,185,129,0.6),rgba(245,158,11,0.6));box-shadow:0 0 10px rgba(245,158,11,0.3);">
-          <div style="position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px #f59e0b;animation:moveDot 4s linear infinite;left:40%;"></div>
-        </div>
-        <div style="text-align:center;position:relative;z-index:2;">
-          <div style="width:55px;height:55px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.8),rgba(245,158,11,0.2));border:2px solid #f59e0b;box-shadow:0 0 25px rgba(245,158,11,0.6),inset 0 0 15px rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:nodePulse 1.5s ease infinite 1s;">
-            <div style="width:14px;height:14px;border-radius:50%;background:#fbbf24;box-shadow:0 0 12px #fbbf24;"></div>
+
+        <div style="position:absolute;right:10px;top:5px;text-align:center;z-index:2;">
+          <div style="width:56px;height:56px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <div style="position:absolute;inset:0;border:2px solid rgba(245,158,11,0.5);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpin 6s linear infinite 0.5s;"></div>
+            <div style="position:absolute;inset:4px;border:1px solid rgba(245,158,11,0.3);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpinR 4s linear infinite;"></div>
+            <div style="position:absolute;inset:10px;border:1px dashed rgba(245,158,11,0.2);border-radius:50%;"></div>
+            <div style="width:18px;height:18px;border-radius:50%;background:#fbbf24;box-shadow:0 0 18px #fbbf24,0 0 35px rgba(245,158,11,0.4);"></div>
           </div>
-          <div style="margin-top:8px;color:#fbbf24;font-size:12px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(245,158,11,0.5);">目标下线</div>
-          <div style="color:rgba(251,191,36,0.6);font-size:9px;font-family:monospace;margin-top:2px;">9月12号</div>
+          <div style="margin-top:6px;color:#fbbf24;font-size:14px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(245,158,11,0.6);">目标下线</div>
+          <div style="color:rgba(251,191,36,0.7);font-size:11px;font-family:monospace;margin-top:2px;">9月12号</div>
         </div>
-        <div style="flex:1;height:2px;margin:0 -5px;position:relative;background:linear-gradient(90deg,rgba(245,158,11,0.6),rgba(239,68,68,0.6));box-shadow:0 0 10px rgba(239,68,68,0.3);">
-          <div style="position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;animation:moveDot 5s linear infinite;left:50%;"></div>
-        </div>
-        <div style="text-align:center;position:relative;z-index:2;">
-          <div style="width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,rgba(239,68,68,0.8),rgba(239,68,68,0.2));border:2px solid #ef4444;box-shadow:0 0 20px rgba(239,68,68,0.6),inset 0 0 15px rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:nodePulse 2s ease infinite 1.5s;">
-            <div style="width:12px;height:12px;border-radius:50%;background:#f87171;box-shadow:0 0 10px #f87171;"></div>
+
+        <div style="position:absolute;right:3%;bottom:15px;text-align:center;z-index:2;">
+          <div style="width:52px;height:52px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <div style="position:absolute;inset:0;border:2px solid rgba(239,68,68,0.5);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpin 8s linear infinite 1.5s;"></div>
+            <div style="position:absolute;inset:4px;border:1px solid rgba(239,68,68,0.3);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpinR 6s linear infinite 1s;"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#f87171;box-shadow:0 0 15px #f87171,0 0 30px rgba(239,68,68,0.4);"></div>
           </div>
-          <div style="margin-top:8px;color:#f87171;font-size:11px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(239,68,68,0.5);">成品下线</div>
-          <div style="color:rgba(248,113,113,0.6);font-size:9px;font-family:monospace;margin-top:2px;">9月17号</div>
+          <div style="margin-top:6px;color:#f87171;font-size:13px;font-weight:bold;font-family:monospace;text-shadow:0 0 8px rgba(239,68,68,0.6);">成品下线</div>
+          <div style="color:rgba(248,113,113,0.7);font-size:11px;font-family:monospace;margin-top:2px;">9月17号</div>
         </div>
+
+        <div style="position:absolute;width:8px;height:8px;border-radius:50%;background:#00ffff;box-shadow:0 0 10px #00ffff,0 0 20px #00ffff;animation:scanRing 2s ease-out infinite;left:8%;bottom:25%;"></div>
       </div>
-      <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);color:rgba(0,255,255,0.2);font-size:7px;font-family:monospace;">TIMELINE v2.0 | DATA-09/03</div>
+
+      <div style="width:100%;max-width:560px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;box-sizing:border-box;z-index:2;">
+        <div style="color:rgba(0,255,255,0.4);font-size:10px;font-family:monospace;">TRAJECTORY v3.0</div>
+        <div style="color:rgba(0,255,136,0.4);font-size:10px;font-family:monospace;">DATA-09/03</div>
+      </div>
     </div>
   </div>
 </div>
